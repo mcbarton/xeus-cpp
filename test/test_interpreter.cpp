@@ -17,7 +17,47 @@
 #include "../src/xsystem.hpp"
 #include "../src/xmagics/os.hpp"
 
+#include <iostream>
+
 #include <fstream>
+#if defined(__GNUC__) && !defined(XEUS_CPP_EMSCRIPTEN_WASM_BUILD)
+    #include <sys/wait.h>
+    #include <unistd.h>
+#endif
+
+
+/// A RAII class to redirect a stream to a stringstream.
+///
+/// This class redirects the output of a given std::ostream to a std::stringstream.
+/// The original stream is restored when the object is destroyed.
+class StreamRedirectRAII {
+    public:
+
+        /// Constructor that starts redirecting the given stream.
+        StreamRedirectRAII(std::ostream& stream) : old_stream_buff(stream.rdbuf()), stream_to_redirect(stream) {
+            stream_to_redirect.rdbuf(ss.rdbuf());
+        }
+
+        /// Destructor that restores the original stream.
+        ~StreamRedirectRAII() {
+            stream_to_redirect.rdbuf(old_stream_buff);
+        }
+
+        /// Get the output that was written to the stream.
+        std::string getCaptured() {
+            return ss.str();
+        }
+
+    private:
+        /// The original buffer of the stream.
+        std::streambuf* old_stream_buff;
+
+        /// The stream that is being redirected.
+        std::ostream& stream_to_redirect;
+
+        /// The stringstream that the stream is redirected to.
+        std::stringstream ss;
+};
 
 TEST_SUITE("execute_request")
 {
@@ -117,6 +157,60 @@ TEST_SUITE("inspect_request")
 
         REQUIRE(result["found"] == false);
         REQUIRE(result["status"] == "error");
+    }
+}
+
+TEST_SUITE("kernel_info_request")
+{
+    TEST_CASE("good_status")
+    {
+        std::vector<const char*> Args = {/*"-v", "resource-dir", "....."*/};
+        xcpp::interpreter interpreter((int)Args.size(), Args.data());
+
+        nl::json result = interpreter.kernel_info_request();
+
+        REQUIRE(result["implementation"] == "xeus-cpp");
+        REQUIRE(result["language_info"]["name"] == "C++");
+        REQUIRE(result["language_info"]["mimetype"] == "text/x-c++src");
+        REQUIRE(result["language_info"]["codemirror_mode"] == "text/x-c++src");
+        REQUIRE(result["language_info"]["file_extension"] == ".cpp");
+        REQUIRE(result["status"] == "ok");
+    }
+
+}
+
+TEST_SUITE("shutdown_request")
+{
+    TEST_CASE("good_status")
+    {
+        std::vector<const char*> Args = {/*"-v", "resource-dir", "....."*/};
+        xcpp::interpreter interpreter((int)Args.size(), Args.data());
+
+        REQUIRE_NOTHROW(interpreter.shutdown_request());
+    }
+
+}
+
+TEST_SUITE("is_complete_request")
+{
+    TEST_CASE("incomplete_code")
+    {
+        std::vector<const char*> Args = {/*"-v", "resource-dir", "....."*/};
+        xcpp::interpreter interpreter((int)Args.size(), Args.data());
+
+        std::string code = "int main() \\";
+        nl::json result = interpreter.is_complete_request(code);
+        REQUIRE(result["status"] == "incomplete");
+    }
+
+    TEST_CASE("complete_code")
+    {
+        std::vector<const char*> Args = {/*"-v", "resource-dir", "....."*/};
+        xcpp::interpreter interpreter((int)Args.size(), Args.data());
+
+        std::string code = "int main() {}";
+        nl::json result = interpreter.is_complete_request(code);
+        REQUIRE(result["status"] == "complete");
     }
 }
 
@@ -435,7 +529,7 @@ TEST_SUITE("os")
 {
     TEST_CASE("write_new_file") {
         xcpp::writefile wf;
-        std::string line = "filename testfile.txt";
+        std::string line = "filename testfile.txt -h";
         std::string cell = "Hello, World!";
 
         wf(line, cell);
@@ -515,7 +609,6 @@ TEST_SUITE("xsystem_clone")
 
         REQUIRE(dynamic_cast<xcpp::xsystem*>(clone) != nullptr);
 
-        delete clone;
     }
 }
 
@@ -530,5 +623,146 @@ TEST_SUITE("xsystem_apply")
         system.apply(code, kernel_res);
 
         REQUIRE(kernel_res["status"] == "ok");
+    }
+}
+
+TEST_SUITE("xmagics_contains"){
+    TEST_CASE("bad_status_cell") {
+        xcpp::xmagics_manager manager;
+        xcpp::xmagic_type magic = xcpp::xmagic_type::cell;
+        // manager.register_magic("my_magic", xcpp::xmagic_type::cell);
+        
+        bool result = manager.contains("my_magic", xcpp::xmagic_type::cell);
+        REQUIRE(result == false);
+    } 
+
+    TEST_CASE("bad_status_line") {
+        xcpp::xmagics_manager manager;
+        xcpp::xmagic_type magic = xcpp::xmagic_type::line;
+        // manager.register_magic("my_magic", xcpp::xmagic_type::cell);
+        
+        bool result = manager.contains("my_magic", xcpp::xmagic_type::line);
+        REQUIRE(result == false);
+    } 
+}
+
+class MyMagicLine : public xcpp::xmagic_line {
+public:
+    virtual void operator()(const std::string& line) override{
+        std::cout << line << std::endl;
+    }
+};
+
+class MyMagicCell : public xcpp::xmagic_cell {
+public:
+    virtual void operator()(const std::string& line, const std::string& cell) override{
+        std::cout << line << cell << std::endl;
+    }
+};
+
+TEST_SUITE("xmagics_apply"){
+    TEST_CASE("bad_status_cell") {
+        xcpp::xmagics_manager manager;
+
+        nl::json kernel_res;
+        manager.apply("%%dummy", kernel_res);
+        REQUIRE(kernel_res["status"] == "error");
+    }
+
+    TEST_CASE("bad_status_line") {
+        xcpp::xmagics_manager manager;
+
+        nl::json kernel_res;
+        manager.apply("%dummy", kernel_res);
+        REQUIRE(kernel_res["status"] == "error");
+    } 
+
+    TEST_CASE("good_status_line") {
+
+        xcpp::xpreamble_manager preamble_manager;
+
+        preamble_manager.register_preamble("magics", new xcpp::xmagics_manager());
+
+        preamble_manager["magics"].get_cast<xcpp::xmagics_manager>().register_magic("magic2", MyMagicCell());
+
+        nl::json kernel_res;
+
+        preamble_manager["magics"].get_cast<xcpp::xmagics_manager>().apply("%%magic2 qwerty", kernel_res);
+
+        REQUIRE(kernel_res["status"] == "ok");
+    } 
+
+    TEST_CASE("good_status_cell") {
+
+        xcpp::xpreamble_manager preamble_manager;
+
+        preamble_manager.register_preamble("magics", new xcpp::xmagics_manager());
+
+        preamble_manager["magics"].get_cast<xcpp::xmagics_manager>().register_magic("magic1", MyMagicLine());
+
+        nl::json kernel_res;
+
+        preamble_manager["magics"].get_cast<xcpp::xmagics_manager>().apply("%magic1 qwerty", kernel_res);
+
+        REQUIRE(kernel_res["status"] == "ok");
+    } 
+
+    TEST_CASE("cell magic with empty cell body") {
+
+        xcpp::xmagics_manager manager;
+
+        StreamRedirectRAII redirect(std::cerr);
+
+        manager.apply("test", "line", "");
+
+        REQUIRE(redirect.getCaptured() == "UsageError: %%test is a cell magic, but the cell body is empty.\n"
+                    "If you only intend to display %%test help, please use a double line break to fill in the cell body.\n");
+    }
+}
+
+#if defined(__GNUC__) && !defined(XEUS_CPP_EMSCRIPTEN_WASM_BUILD)
+TEST_SUITE("xutils_handler"){
+    TEST_CASE("handler") {
+        pid_t pid = fork();
+        if (pid == 0) {
+
+            signal(SIGSEGV, xcpp::handler);
+            exit(0);  
+
+        } else {
+            
+            int status;
+            REQUIRE(WEXITSTATUS(status) == 0);
+            
+        }
+    }
+}
+#endif
+
+TEST_SUITE("complete_request")
+{
+    TEST_CASE("completion_test")
+    {
+        std::vector<const char*> Args = {/*"-v", "resource-dir", "....."*/};
+        xcpp::interpreter interpreter((int)Args.size(), Args.data());
+
+        nl::json execute = interpreter.execute_request("#include <iostream>", false, false, nl::json::object(), false);
+
+        REQUIRE(execute["status"] == "ok");
+
+        std::string code = "st";
+        int cursor_pos = 2;
+        nl::json result = interpreter.complete_request(code, cursor_pos);
+
+        REQUIRE(result["cursor_start"] == 0);
+        REQUIRE(result["cursor_end"] == 2);
+        REQUIRE(result["status"] == "ok");
+        size_t found = 0;
+        for (auto& r : result["matches"]) {
+            if (r == "static" || r == "struct") {
+                found++;
+            }
+        }
+        REQUIRE(found == 2);
     }
 }
