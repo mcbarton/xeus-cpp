@@ -111,8 +111,12 @@ namespace xcpp
 #else
         const char separator = '/';
 #endif
-
-        return prefix + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
+//FIXME: Need to work for non release builds too.
+#if defined(_MSC_VER)
+    return prefix + separator + "Release" + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
+#else
+    return prefix + separator + "Release" + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
+#endif
     }
 
     std::string retrieve_tagfile_dir()
@@ -130,7 +134,12 @@ namespace xcpp
 #else
         const char separator = '/';
 #endif
+//FIXME: Need to work for non release builds too.
+#if defined(_MSC_VER)
+    return prefix + separator + "Release" + separator + "share" + separator + "xeus-cpp" + separator + "tagfiles";
+#else
+    return prefix + separator + "Release" + separator + "share" + separator + "xeus-cpp" + separator + "tagfiles";
+#endif
 
-        return prefix + separator + "share" + separator + "xeus-cpp" + separator + "tagfiles";
     }
 }
