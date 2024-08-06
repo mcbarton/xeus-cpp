@@ -115,7 +115,7 @@ namespace xcpp
 #if defined(_MSC_VER)
     return prefix + separator + "Release" + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
 #else
-    return prefix + separator + "Release" + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
+    return prefix + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
 #endif
     }
 
@@ -138,7 +138,7 @@ namespace xcpp
 #if defined(_MSC_VER)
     return prefix + separator + "Release" + separator + "share" + separator + "xeus-cpp" + separator + "tagfiles";
 #else
-    return prefix + separator + "Release" + separator + "share" + separator + "xeus-cpp" + separator + "tagfiles";
+    return prefix + separator + "share" + separator + "xeus-cpp" + separator + "tagfiles";
 #endif
 
     }
