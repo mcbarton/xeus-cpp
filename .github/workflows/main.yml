@@ -139,7 +139,7 @@ jobs:
         shell: bash -l {0}
         run: |
           cd test
-          pytest -sv .  --reruns 5
+          pytest -sv .
   
       - name: Python tests Windows Systems
         if: ${{ runner.os == 'windows' }}
@@ -212,7 +212,7 @@ jobs:
           init-shell: >-
             ${{ matrix.micromamba_shell_init }}
           environment-name: xeus-cpp-wasm-build
-      
+
       - name: Setup default Build Type on *nux
         if: ${{ runner.os != 'windows' }}
         run: |

@@ -14,6 +14,10 @@
 `xeus-cpp` is a Jupyter kernel for cpp based on the native implementation of the
 Jupyter protocol [xeus](https://github.com/jupyter-xeus/xeus).
 
+Try Jupyter Lite demo by clicking below
+
+[![lite-badge](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://compiler-research.github.io/xeus-cpp/lab/index.html)
+
 ## Installation within a mamba environment (non wasm build instructions)
 
 To ensure that the installation works, it is preferable to install `xeus-cpp` in a
@@ -36,7 +40,7 @@ source activate  "xeus-cpp"
 ```
 We will now install the dependencies needed to compile xeux-cpp from source within this environment by executing the following
 ```bash
-mamba install notebook cmake cxx-compiler xeus-zmq nlohmann_json=3.11.2 cppzmq xtl jupyterlab CppInterOp cpp-argparse<3.1 pugixml doctest -c conda-forge
+mamba install notebook cmake cxx-compiler xeus-zmq nlohmann_json=3.11.3 jupyterlab CppInterOp cpp-argparse<3.1 pugixml doctest -c conda-forge
 ```
 Now you can compile the kernel from the source by executing (replace `$CONDA_PREFIX` with a custom installation prefix if need be)
 ```bash
@@ -52,7 +56,8 @@ cd test
 ```
 and
 ```bash
-pytest -sv .
+cd ../../test
+pytest -sv test_xcpp_kernel.py
 ```
 to perform the python tests.
 
@@ -67,7 +72,8 @@ cd ./xeus-cpp
 Now you'll want to create a clean mamba environment containing the tools you'll need to do a wasm build. This can be done by executing 
 the following
 ```bash
-micromamba create -n "xeus-cpp-wasm-build" -y environment-wasm-build.yml
+micromamba create -f environment-wasm-build.yml -y
+micromamba activate xeus-cpp-wasm-build
 ```
 
 You'll now want to make sure you're using emsdk version "3.1.45" and activate it. You can get this by executing the following
@@ -97,13 +103,18 @@ emcmake cmake \
 EMCC_CFLAGS='-sERROR_ON_UNDEFINED_SYMBOLS=0' emmake make install
 ```
 
-To test building Jupyter Lite with this kernel without creating a website you can execute the following
+To build Jupyter Lite with this kernel without creating a website you can execute the following
 ```bash
 micromamba create -n xeus-lite-host jupyterlite-core
 micromamba activate xeus-lite-host
 python -m pip install jupyterlite-xeus
 jupyter lite build --XeusAddon.prefix=$PREFIX
 ```
+Once the Jupyter Lite site has built you can test the website locally by executing
+```bash
+jupyter lite serve --XeusAddon.prefix=$PREFIX
+```
+
 
 ## Trying it online
 
@@ -121,21 +132,25 @@ http://xeus-cpp.readthedocs.io
 
 `xeus-cpp` depends on
 
-- [xeus-zmq](https://github.com/jupyter-xeus/xeus-zmq)
-- [xtl](https://github.com/xtensor-stack/xtl)
-- [nlohmann_json](https://github.com/nlohmann/json)
-- [cppzmq](https://github.com/zeromq/cppzmq)
-- [clang](https://github.com/llvm/llvm-project/)
-- [argparse](https://github.com/p-ranav/argparse)
 
-| `xeus-cpp` | `xeus-zmq`      | `xtl`           | `CppInterOp` | `clang`   | `pugixml` | `cppzmq` | `cpp-argparse`| `nlohmann_json` | `dirent` (windows only) |
-|------------|-----------------|-----------------|--------------|-----------|-----------|----------|---------------|-----------------|-------------------------|
-|  main      |  >=1.0.0,<2.0.0 |  >=0.7.7,<0.8.0 | >=1.3.0      |           | ~1.8.1    | ~4.3.0   | <3.1          | >=3.11.2,<4.0   | >=2.3.2,<3              |
-|  0.4.0     |  >=1.0.0,<2.0.0 |  >=0.7.7,<0.8.0 |              | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    | >=2.3.2,<3              |
-|  0.3.0     |  >=1.0.0,<2.0.0 |  >=0.7.7,<0.8.0 |              | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    | >=2.3.2,<3              |
-|  0.2.0     |  >=1.0.0,<2.0.0 |  >=0.7.7,<0.8.0 |              | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    | >=2.3.2,<3              |
-|  0.1.0     |  >=1.0.0,<2.0.0 |  >=0.7.0,<0.8.0 |              | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    | >=2.3.2,<3              |
-|  0.0.1     |  >=1.0.0,<2.0.0 |  >=0.7.0,<0.8.0 |              | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    | >=2.3.2,<3              |
+- [xeus-zmq](https://github.com/jupyter-xeus/xeus-zmq)
+- [nlohmann_json](https://github.com/nlohmann/json)
+- [argparse](https://github.com/p-ranav/argparse)
+- [CppInterOp](https://github.com/compiler-research/CppInterOp)
+
+| `xeus-cpp` | `xeus-zmq`      | `CppInterOp` | `pugixml` | `cpp-argparse`| `nlohmann_json` |
+|------------|-----------------|--------------|-----------|---------------|-----------------|
+|  main      |  >=3.0.0,<4.0.0 | >=1.3.0      | ~1.8.1    | <3.1          | >=3.11.3,<4.0   |
+|  0.5.0     |  >=3.0.0,<4.0.0 | >=1.3.0      | ~1.8.1    | <3.1          | >=3.11.3,<4.0   |
+
+Versions prior to `0.5.0` have an additional dependency on [xtl](https://github.com/xtensor-stack/xtl), [clang](https://github.com/llvm/llvm-project/) & [cppzmq](https://github.com/zeromq/cppzmq)
+
+| `xeus-cpp` | `xeus-zmq`      | `xtl`           | `clang`   | `pugixml` | `cppzmq` | `cpp-argparse`| `nlohmann_json` |
+|------------|-----------------|-----------------|-----------|-----------|----------|---------------|-----------------|
+|  0.4.0     |  >=1.0.0,<2.0.0 |  >=0.7.7,<0.8.0 | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    |
+|  0.3.0     |  >=1.0.0,<2.0.0 |  >=0.7.7,<0.8.0 | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    |
+|  0.2.0     |  >=1.0.0,<2.0.0 |  >=0.7.7,<0.8.0 | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    |
+|  0.1.0     |  >=1.0.0,<2.0.0 |  >=0.7.0,<0.8.0 | >=16,<17  | ~1.8.1    | ~4.3.0   | ~2.9          | >=3.6.1,<4.0    |
 
 ## Contributing
 

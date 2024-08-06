@@ -15,10 +15,9 @@
 
 #include <pugixml.hpp>
 
-#include <xtl/xsystem.hpp>
-
 #include "xeus-cpp/xbuffer.hpp"
 #include "xeus-cpp/xpreamble.hpp"
+#include "xeus-cpp/xutils.hpp"
 
 #include "xdemangle.hpp"
 #include "xparser.hpp"
@@ -124,8 +123,8 @@ namespace xcpp
 
     void inspect(const std::string& code, nl::json& kernel_res)
     {
-        std::string tagconf_dir = XCPP_TAGCONFS_DIR;
-        std::string tagfiles_dir = XCPP_TAGFILES_DIR;
+        std::string tagconf_dir = retrieve_tagconf_dir();
+        std::string tagfiles_dir = retrieve_tagfile_dir();
 
         nl::json tagconfs = read_tagconfs(tagconf_dir.c_str());
 
@@ -280,9 +279,9 @@ namespace xcpp
             inspect(to_inspect[1], kernel_res);
         }
 
-        virtual xpreamble* clone() const override
+        [[nodiscard]] std::unique_ptr<xpreamble> clone() const override
         {
-            return new xintrospection(*this);
+            return std::make_unique<xintrospection>(*this);
         }
     };
 
