@@ -175,7 +175,40 @@ xcpp::display(marie);""",
                             if input_cell.outputs != output_cell.outputs:
                                 self.fail(f"{input_output.get('text')} != {output_output.get('text')} Cell {i} in notebook {name} has mismatched output type")
 
+if platform.system() == 'Windows':
+    class XCppTests_debug(jupyter_kernel_test.KernelTests):
 
+        kernel_name = 'xcpp20'
+
+        # language_info.name in a kernel_info_reply should match this
+        language_name = 'C++'
+
+        code_err="""
+        #include <iostream>
+        std::cerr << "oops" << std::endl;
+        """
+
+        code_stdout="""
+        #include <iostream>
+        std::cout << "oops_std" << std::endl;
+        """
+        
+        def test_xcpp_err(self):
+            self.flush_channels()
+            reply, output_msgs = self.execute_helper(code=self.code_err)
+            print(output_msgs)
+            self.assertEqual(output_msgs[0]['msg_type'], 'stream')
+            self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
+            self.assertEqual(output_msgs[0]['content']['text'], 'oops\n')
+
+        def test_xcpp_stdout(self):
+            self.flush_channels()
+            reply, output_msgs = self.execute_helper(code=self.code_stdout)
+            print(output_msgs)
+            self.assertEqual(output_msgs[0]['msg_type'], 'stream')
+            self.assertEqual(output_msgs[0]['content']['name'], 'stdout')
+            self.assertEqual(output_msgs[0]['content']['text'], 'oops_std\n')
+            
 class XCppTests2(jupyter_kernel_test.KernelTests):
 
     kernel_name = 'xcpp20'
