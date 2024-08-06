@@ -113,7 +113,7 @@ namespace xcpp
 #endif
 //FIXME: Need to work for non release builds too.
 #if defined(_MSC_VER)
-    return prefix + separator + "Release" + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
+    return prefix + separator + ".." + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
 #else
     return prefix + separator + "etc" + separator + "xeus-cpp" + separator + "tags.d";
 #endif
