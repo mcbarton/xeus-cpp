@@ -399,12 +399,12 @@ if(MSVC)
     )
 
     # Compiler added symbols for static variables. NOT for VStudio < 2015
-    set(xeus_cpp _exports ${ xeus_cpp exports} _Init_thread_abort _Init_thread_epoch
+    set(xeus_cpp_exports ${xeus_cpp_exports} _Init_thread_abort _Init_thread_epoch
         _Init_thread_footer _Init_thread_header _tls_index
     )
 
     # new/delete variants needed when linking to static msvc runtime (esp. Debug)
-    set(xeus_cpp _exports ${ xeus_cpp _exports}
+    set(xeus_cpp _exports ${xeus_cpp_exports}
         ??2@YAPEAX_K@Z
         ??3@YAXPEAX@Z
         ??3@YAXPEAX_K@Z
@@ -414,7 +414,7 @@ if(MSVC)
 
     # Most (if not all) of these MSVC decided are inlines that aren't exported
     # TODO: There are probably some missing. Why?
-    set(xeus_cpp _exports ${ xeus_cpp _exports} ?print@Decl@clang@@QEBAXAEAVraw_ostream@llvm@@I_N@Z
+    set(xeus_cpp_exports ${xeus_cpp_exports} ?print@Decl@clang@@QEBAXAEAVraw_ostream@llvm@@I_N@Z
         ??6raw_ostream@llvm@@QEAAAEAV01@PEBX@Z
         ?decls_begin@DeclContext@clang@@QEBA?AVdecl_iterator@12@XZ
         ?errs@llvm@@YAAEAVraw_ostream@1@XZ
@@ -432,15 +432,15 @@ if(MSVC)
         ?classof@DeclContext@clang@@SA_NPEBVDecl@2@@Z    )
 
     if($<CONFIG:Debug>)
-        set(xeus_cpp _exports ${xeus_cpp _exports} ??$dyn_cast@VValueDecl@clang@@$$CBVDecl@2@@llvm@@YAPEBVValueDecl@clang@@PEBVDecl@2@@Z)
+        set(xeus_cpp_exports ${xeus_cpp_exports} ??$dyn_cast@VValueDecl@clang@@$$CBVDecl@2@@llvm@@YAPEBVValueDecl@clang@@PEBVDecl@2@@Z)
     endif()
 
     # List to '/EXPORT:sym0 /EXPORT:sym1 /EXPORT:sym2 ...'
-    foreach(sym ${xeus_cpp _exports})
-        set(xeus_cpp _link_str "${ xeus_cpp _link_str} /EXPORT:${sym}")
-    endforeach(sym ${ xeus_cpp _exports})
+    foreach(sym ${xeus_cpp_exports})
+        set(xeus_cpp _link_str "${xeus_cpp_link_str} /EXPORT:${sym}")
+    endforeach(sym ${xeus_cpp_exports})
 
-    set_property(TARGET xeus-cpp APPEND_STRING PROPERTY LINK_FLAGS ${xeus_cpp _link_str})
+    set_property(TARGET xeus-cpp APPEND_STRING PROPERTY LINK_FLAGS ${xeus_cpp_link_str})
 endif(MSVC)
 
 
