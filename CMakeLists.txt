@@ -404,7 +404,7 @@ if(MSVC)
     )
 
     # new/delete variants needed when linking to static msvc runtime (esp. Debug)
-    set(xeus_cpp _exports ${xeus_cpp_exports}
+    set(xeus_cpp_exports ${xeus_cpp_exports}
         ??2@YAPEAX_K@Z
         ??3@YAXPEAX@Z
         ??3@YAXPEAX_K@Z
