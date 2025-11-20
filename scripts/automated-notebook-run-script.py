@@ -1,12 +1,14 @@
 import argparse
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
-
+import subprocess
 
 def main():
     parser = argparse.ArgumentParser(description="Run Selenium with a chosen driver")
@@ -24,10 +26,15 @@ def main():
     # This will start the right driver depending on what
     # driver option is chosen
     if args.driver == "chrome":
-        driver = webdriver.Chrome()
+        options = ChromeOptions()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        driver = webdriver.Chrome(options=options)
 
     elif args.driver == "firefox":
-        driver = webdriver.Firefox()
+        options = FirefoxOptions()
+        options.add_argument("--headless")
+        driver = webdriver.Firefox(options=options)
 
     elif args.driver == "safari":
         driver = webdriver.Safari()
@@ -63,7 +70,7 @@ def main():
             )
         )
         actions.move_to_element(run_all_menu).click().perform()
-        time.sleep(100)
+        time.sleep(300)
 
     elif args.driver == "firefox":
         print("Opening Run Menu")
@@ -79,7 +86,7 @@ def main():
             )
         )
         actions.move_to_element(run_all_menu).click().perform()
-        time.sleep(100)
+        time.sleep(200)
 
     elif args.driver == "safari":
         print("Running all cells using Shift+Enter...")
@@ -102,7 +109,7 @@ def main():
             notebook_area.send_keys(Keys.SHIFT, Keys.ENTER)
             time.sleep(0.5)
 
-        time.sleep(145)
+        time.sleep(600)
 
     if args.driver == "chrome" or args.driver == "firefox":
         print("Saving notebook")
@@ -161,8 +168,13 @@ def main():
     return deepQuerySelector(document, "jp-button[data-command='docmanager:download']");
     """
 
-    download_button = driver.execute_script(search_script)
+    download_button = WebDriverWait(driver, 20).until(
+    lambda d: d.execute_script(search_script)
+    )
 
+    print("Found element:", download_button)
+
+    time.sleep(20)
     driver.execute_script(
         """
         const el = arguments[0];
@@ -182,7 +194,8 @@ def main():
         """,
         download_button,
     )
-    time.sleep(2)
+
+    time.sleep(20)
 
     # Close browser
     driver.quit()
