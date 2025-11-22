@@ -353,19 +353,18 @@ jobs:
           # to run notebooks in it. If you try to run the notebooks before the website is
           # ready the ci python script will crash saying ti cannot access the url
           sleep 10
+          if [[ "${{ matrix.os }}" == "macos"* ]]; then
+            python scripts/automated-notebook-run-script.py --driver safari
+            find / -name "*smallpt*"
+            nbdiff notebooks/smallpt.ipynb $HOME/Downloads/smallpt.ipynb
+            rm $HOME/Downloads/smallpt.ipynb
+          fi
           python scripts/automated-notebook-run-script.py --driver chrome
           nbdiff notebooks/smallpt.ipynb $HOME/Downloads/smallpt.ipynb
           rm $HOME/Downloads/smallpt.ipynb
           python scripts/automated-notebook-run-script.py --driver firefox
           nbdiff notebooks/smallpt.ipynb $HOME/Downloads/smallpt.ipynb
           rm $HOME/Downloads/smallpt.ipynb          
-          if [[ "${{ matrix.os }}" == "macos"* ]]; then
-            defaults write com.apple.Safari AskBeforeDownloading -bool false
-            python scripts/automated-notebook-run-script.py --driver safari
-            find $HOME -name "*smallpt*"
-            nbdiff notebooks/smallpt.ipynb $HOME/Downloads/smallpt.ipynb
-            rm $HOME/Downloads/smallpt.ipynb
-          fi
         timeout-minutes: 25
 
       - name: Setup tmate session
