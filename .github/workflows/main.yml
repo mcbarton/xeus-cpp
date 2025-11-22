@@ -355,7 +355,7 @@ jobs:
           sleep 10
           if [[ "${{ matrix.os }}" == "macos"* ]]; then
             python scripts/automated-notebook-run-script.py --driver safari
-            find / -name "*smallpt*"
+            ls $HOME/Downloads/
             nbdiff notebooks/smallpt.ipynb $HOME/Downloads/smallpt.ipynb
             rm $HOME/Downloads/smallpt.ipynb
           fi
