@@ -175,25 +175,26 @@ def main():
     print("Found element:", download_button)
 
     time.sleep(20)
-    driver.execute_script(
-        """
-        const el = arguments[0];
-        
-        // Force element to be visible and focused
-        el.scrollIntoView({block: 'center', inline: 'center'});
-        
-        // Dispatch real mouse events since Safari WebDriver ignores .click() on Web Components
-        ['pointerdown', 'mousedown', 'mouseup', 'click'].forEach(type => {
-        el.dispatchEvent(new MouseEvent(type, {
+    driver.execute_script("""
+const el = arguments[0];
+
+function fire(type) {
+    el.dispatchEvent(new MouseEvent(type, {
         bubbles: true,
         cancelable: true,
-        composed: true,   // IMPORTANT for shadow DOM
+        composed: true,
         view: window
-        }));
-        });
-        """,
-        download_button,
-    )
+    }));
+}
+
+el.scrollIntoView({ block: 'center', inline: 'center' });
+el.focus({ preventScroll: true });
+
+fire('pointerdown');
+fire('mousedown');
+fire('mouseup');
+fire('click');
+""", download_button)
 
     time.sleep(20)
 
