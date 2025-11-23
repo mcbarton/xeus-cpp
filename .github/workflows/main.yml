@@ -81,7 +81,7 @@ jobs:
         shell: bash -l {0}
         run: |
           set -e
-          micromamba create -n xeus-lite-host jupyterlite-core=0.6 jupyterlite-xeus jupyter-server -c conda-forge
+          micromamba create -n xeus-lite-host jupyterlite-core=0.6 jupyterlite-xeus jupyter_server -c conda-forge
           micromamba activate xeus-lite-host
           if [[ "${{ matrix.os }}" == "macos"* ]]; then
             brew install coreutils
