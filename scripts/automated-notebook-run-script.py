@@ -6,7 +6,9 @@ def main():
     pyautogui.moveTo(150, 720, duration=1)
     pyautogui.click()
     time.sleep(1)
-    pyautogui.hotkey('command', ',')
+    pyautogui.moveTo(50, 50, duration=1)
+    pyautogui.click()
+    time.sleep(1)
     output_file = "screenshot.png"
     subprocess.run(["screencapture", "-C", output_file])
 
