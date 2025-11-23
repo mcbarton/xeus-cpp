@@ -134,9 +134,8 @@ def main():
 
         notebook_area.send_keys(Keys.ENTER)
         time.sleep(1)
-    pyautogui.hotkey('command', ',')
     time.sleep(1)
-    pyautogui.moveTo(200, 443, duration=1)
+    pyautogui.moveTo(10, 10, duration=1)
     #pyautogui.moveTo(695, 443, duration=1)
     pyautogui.click()
     time.sleep(1)
