@@ -27,13 +27,14 @@ def main():
     pyautogui.moveTo(350, 630, duration=1)
     pyautogui.click()
     time.sleep(1.2)
+    # Change ask to allow
     pyautogui.moveTo(950, 690, duration=1)
     pyautogui.click()
     pyautogui.moveTo(950, 670, duration=1)
+    pyautogui.click()
     time.sleep(1.2)
     output_file = "screenshot.png"
     subprocess.run(["screencapture", "-C", output_file])
-
 
 if __name__ == "__main__":
     main()
