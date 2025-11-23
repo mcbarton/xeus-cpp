@@ -201,7 +201,7 @@ fire('click');
     pyautogui.click()
     time.sleep(1)
     output_file = "screenshot.png"
-    subprocess.run(["screencapture", "-x", output_file])
+    subprocess.run(["screencapture", "-C", output_file])
 
     print(f"Saved {output_file}")
     time.sleep(10)
