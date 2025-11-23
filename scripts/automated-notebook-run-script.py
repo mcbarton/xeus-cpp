@@ -144,64 +144,6 @@ def main():
     # This downloads the notebook, so it can be compared
     # to a reference notebook
     print("Downloading notebook by clicking download button")
-    search_script = """
-    function deepQuerySelector(root, selector) {
-    const walker = document.createTreeWalker(
-    root,
-    NodeFilter.SHOW_ELEMENT,
-    {
-    acceptNode: node => NodeFilter.FILTER_ACCEPT
-    },
-    false
-    );
-    
-    while (walker.nextNode()) {
-    let node = walker.currentNode;
-    
-    // Check if this node matches
-    if (node.matches && node.matches(selector)) {
-    return node;
-    }
-    
-    // If this element has a shadow root, search inside it
-    if (node.shadowRoot) {
-    const found = deepQuerySelector(node.shadowRoot, selector);
-    if (found) return found;
-    }
-    }
-    return null;
-    }
-    
-    return deepQuerySelector(document, "jp-button[data-command='docmanager:download']");
-    """
-
-    download_button = WebDriverWait(driver, 5).until(
-    lambda d: d.execute_script(search_script)
-    )
-
-    print("Found element:", download_button)
-
-    time.sleep(1)
-    driver.execute_script("""
-const el = arguments[0];
-
-function fire(type) {
-    el.dispatchEvent(new MouseEvent(type, {
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-        view: window
-    }));
-}
-
-el.scrollIntoView({ block: 'center', inline: 'center' });
-el.focus({ preventScroll: true });
-
-fire('pointerdown');
-fire('mousedown');
-fire('mouseup');
-fire('click');
-""", download_button)
     time.sleep(1)
     output_file = "screenshot.png"
     subprocess.run(["screencapture", "-C", output_file])
