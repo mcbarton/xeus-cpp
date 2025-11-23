@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 import subprocess
+import pyautogui
 
 def main():
     parser = argparse.ArgumentParser(description="Run Selenium with a chosen driver")
@@ -196,6 +197,8 @@ fire('mouseup');
 fire('click');
 """, download_button)
     time.sleep(1)
+    pyautogui.moveTo(695, 323, duration=1)
+    pyautogui.click()
     output_file = "screenshot.png"
     subprocess.run(["screencapture", "-x", output_file])
 
