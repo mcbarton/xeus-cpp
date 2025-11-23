@@ -102,13 +102,15 @@ jobs:
           sleep 10
           if [[ "${{ matrix.os }}" == "macos"* ]]; then
             python scripts/automated-notebook-run-script.py --driver safari
+            mkdir screenshots
+            mv screenshot.png screenshots
           fi      
         timeout-minutes: 25
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./screenshot.png
+          path: ./screenshots
 
       - name: Setup tmate session
         if: ${{ failure() && runner.debug }}
