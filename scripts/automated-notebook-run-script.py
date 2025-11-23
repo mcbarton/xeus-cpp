@@ -14,7 +14,7 @@ def main():
     time.sleep(1.2)
     pyautogui.moveTo(10, 20, duration=1)
     time.sleep(1.2)
-    pyautogui.moveTo(400, 500, duration=1)
+    pyautogui.moveTo(800, 250, duration=1)
     time.sleep(1.2)
     output_file = "screenshot.png"
     subprocess.run(["screencapture", "-C", output_file])
