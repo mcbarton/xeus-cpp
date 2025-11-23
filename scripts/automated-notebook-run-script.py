@@ -3,7 +3,7 @@ import pyautogui
 import time
 
 def main():
-    pyautogui.moveTo(100, 700, duration=1)
+    pyautogui.moveTo(150, 720, duration=1)
     pyautogui.click()
     time.sleep(1)
     output_file = "screenshot.png"
