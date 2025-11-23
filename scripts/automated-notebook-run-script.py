@@ -14,11 +14,11 @@ def main():
     # Click Settings
     pyautogui.moveTo(75, 102, duration=1)
     pyautogui.click()
-    time.sleep(1.2)
+    time.sleep(2.4)
     # This is done while waiting for settings page
     # to appear
-    pyautogui.moveTo(10, 20, duration=1)
-    time.sleep(1.2)
+    #pyautogui.moveTo(10, 20, duration=1)
+    #time.sleep(1.2)
     # Click websites page of settings
     pyautogui.moveTo(700, 240, duration=1)
     pyautogui.click()
