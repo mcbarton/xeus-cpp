@@ -110,7 +110,7 @@ def main():
             notebook_area.send_keys(Keys.SHIFT, Keys.ENTER)
             time.sleep(0.5)
 
-        time.sleep(5)
+        time.sleep(10)
 
     if args.driver == "chrome" or args.driver == "firefox":
         print("Saving notebook")
@@ -133,7 +133,7 @@ def main():
         time.sleep(0.5)
 
         notebook_area.send_keys(Keys.ENTER)
-        time.sleep(0.5)
+        time.sleep(1)
     pyautogui.hotkey('command', ',')
     time.sleep(1)
     pyautogui.moveTo(200, 443, duration=1)
@@ -175,13 +175,13 @@ def main():
     return deepQuerySelector(document, "jp-button[data-command='docmanager:download']");
     """
 
-    download_button = WebDriverWait(driver, 20).until(
+    download_button = WebDriverWait(driver, 5).until(
     lambda d: d.execute_script(search_script)
     )
 
     print("Found element:", download_button)
 
-    time.sleep(20)
+    time.sleep(1)
     driver.execute_script("""
 const el = arguments[0];
 
@@ -207,7 +207,7 @@ fire('click');
     subprocess.run(["screencapture", "-C", output_file])
 
     print(f"Saved {output_file}")
-    time.sleep(10)
+    time.sleep(1)
     
     # Close browser
     driver.quit()
