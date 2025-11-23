@@ -110,7 +110,7 @@ def main():
             notebook_area.send_keys(Keys.SHIFT, Keys.ENTER)
             time.sleep(0.5)
 
-        time.sleep(600)
+        time.sleep(5)
 
     if args.driver == "chrome" or args.driver == "firefox":
         print("Saving notebook")
@@ -134,7 +134,13 @@ def main():
 
         notebook_area.send_keys(Keys.ENTER)
         time.sleep(0.5)
-
+    pyautogui.hotkey('command', ',')
+    time.sleep(1)
+    pyautogui.moveTo(200, 443, duration=1)
+    #pyautogui.moveTo(695, 443, duration=1)
+    pyautogui.click()
+    time.sleep(1)
+    
     # This downloads the notebook, so it can be compared
     # to a reference notebook
     print("Downloading notebook by clicking download button")
@@ -196,9 +202,6 @@ fire('mousedown');
 fire('mouseup');
 fire('click');
 """, download_button)
-    time.sleep(1)
-    pyautogui.moveTo(695, 443, duration=1)
-    pyautogui.click()
     time.sleep(1)
     output_file = "screenshot.png"
     subprocess.run(["screencapture", "-C", output_file])
