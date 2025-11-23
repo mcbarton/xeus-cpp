@@ -195,9 +195,13 @@ fire('mousedown');
 fire('mouseup');
 fire('click');
 """, download_button)
+    time.sleep(1)
+    output_file = "screenshot.png"
+    subprocess.run(["screencapture", "-x", output_file])
 
-    time.sleep(20)
-
+    print(f"Saved {output_file}")
+    time.sleep(10)
+    
     # Close browser
     driver.quit()
 
