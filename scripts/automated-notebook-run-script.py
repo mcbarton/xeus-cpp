@@ -197,7 +197,7 @@ fire('mouseup');
 fire('click');
 """, download_button)
     time.sleep(1)
-    pyautogui.moveTo(695, 373, duration=1)
+    pyautogui.moveTo(695, 423, duration=1)
     pyautogui.click()
     time.sleep(1)
     output_file = "screenshot.png"
