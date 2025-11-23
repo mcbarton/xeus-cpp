@@ -96,12 +96,14 @@ jobs:
                          --contents notebooks/images/marie.png \
                          --contents notebooks/audio/audio.wav &
           python -m pip install selenium
+          python -m pip install PyAutoGUI
           # This sleep is to force enough time for the jupyter site to build before trying
           # to run notebooks in it. If you try to run the notebooks before the website is
           # ready the ci python script will crash saying ti cannot access the url
           sleep 10
           if [[ "${{ matrix.os }}" == "macos"* ]]; then
             python scripts/automated-notebook-run-script.py --driver safari
+            ls $HOME/Downloads/
             mkdir screenshots
             mv screenshot.png screenshots
           fi      
