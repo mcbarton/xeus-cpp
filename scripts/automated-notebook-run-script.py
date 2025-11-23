@@ -1,5 +1,6 @@
 import subprocess
 import pyautogui
+import time
 
 def main():
     pyautogui.moveTo(1000, 10, duration=1)
