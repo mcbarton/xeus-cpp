@@ -115,95 +115,8 @@ def run_notebook(driver, notebook_area, args):
             wait_for_idle_status(driver, current_cell, start_time, timeout)
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Run Selenium with a chosen driver")
-    parser.add_argument(
-        "--driver",
-        type=str,
-        default="chrome",
-        choices=["chrome", "firefox", "safari"],
-        help="Choose which WebDriver to use",
-    )
-    parser.add_argument(
-        "--notebook",
-        type=str,
-        required=True,
-        help="Notebook to execute",
-    )
-    parser.add_argument(
-        "--kernel",
-        type=str,
-        required=True,
-        help="Kernel to run notebook in",
-    )
-    parser.add_argument(
-        "--stdin",
-        type=str,
-        help="Text to pass to standard input",
-    )
-
-    args = parser.parse_args()
-    URL = f"http://127.0.0.1:8000/lab/index.html?path={args.notebook}"
-
-    # This will start the right driver depending on what
-    # driver option is chosen
-    if args.driver == "chrome":
-        options = ChromeOptions()
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        driver = webdriver.Chrome(options=options)
-
-    elif args.driver == "firefox":
-        options = FirefoxOptions()
-        options.add_argument("--headless")
-        driver = webdriver.Firefox(options=options)
-
-    elif args.driver == "safari":
-        driver = webdriver.Safari()
-
-    wait = WebDriverWait(driver, 30)
-    actions = ActionChains(driver)
-
-    # Open Jupyter Lite with the notebook requested
-    driver.get(URL)
-
-    # Waiting for Jupyter Lite URL to finish loading
-    notebook_area = wait.until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, ".jp-Notebook"))
-    )
-
-    time.sleep(1)
-    actions.context_click(notebook_area).pause(0.01).send_keys(Keys.DOWN * 9).pause(
-        0.01
-    ).send_keys(Keys.ENTER).pause(0.01).perform()
-
-    # Select Kernel based on input
-    kernel_button = driver.find_element(
-        By.CSS_SELECTOR, "jp-button.jp-Toolbar-kernelName.jp-ToolbarButtonComponent"
-    )
-    driver.execute_script("arguments[0].click();", kernel_button)
-    driver.switch_to.active_element.send_keys(Keys.TAB)
-    time.sleep(0.01)
-    actions.send_keys(f"{args.kernel}").perform()
-    time.sleep(0.01)
-    actions.send_keys(Keys.TAB).perform()
-    time.sleep(0.01)
-    actions.send_keys(Keys.ENTER).perform()
-    time.sleep(0.01)
-
-    # This will run all the cells of the chosen notebook
-    run_notebook(driver, notebook_area, args)
-
-    # This section saves the notebook,
-    print("Saving the notebook")
-    notebook_area.send_keys(Keys.COMMAND, "s")
-    time.sleep(0.5)
-
-    notebook_area.send_keys(Keys.ENTER)
-    time.sleep(0.5)
-
-    # This section downloads the notebook, so it can be compared
-    # to a reference notebook
+def download_notebook(driver):
+    """This function is used to download the notebook currently open."""
     print("Downloading notebook by clicking download button")
     search_script = """
     function deepQuerySelector(root, selector) {
@@ -260,6 +173,120 @@ def main():
     )
 
     time.sleep(1)
+
+
+def choose_kernel(driver, args):
+    """This function sets the kernel based on the user input."""
+    kernel_button = driver.find_element(
+        By.CSS_SELECTOR, "jp-button.jp-Toolbar-kernelName.jp-ToolbarButtonComponent"
+    )
+    driver.execute_script("arguments[0].click();", kernel_button)
+    driver.switch_to.active_element.send_keys(Keys.TAB)
+    time.sleep(0.01)
+    ActionChains(driver).send_keys(f"{args.kernel}").perform()
+    time.sleep(0.01)
+    ActionChains(driver).send_keys(Keys.TAB).perform()
+    time.sleep(0.01)
+    ActionChains(driver).send_keys(Keys.ENTER).perform()
+    time.sleep(0.01)
+
+
+def save_notebook(notebook_area):
+    """This function saves the notebook."""
+    print("Saving the notebook")
+    notebook_area.send_keys(Keys.COMMAND, "s")
+    time.sleep(0.5)
+
+
+def clear_notebook_output(driver, notebook_area):
+    """
+    This function clears the output of all cells in the notebook, before it is
+    executed by run_notebook.
+    """
+    ActionChains(driver).context_click(notebook_area).pause(0.01).send_keys(
+        Keys.DOWN * 9
+    ).pause(0.01).send_keys(Keys.ENTER).pause(0.01).perform()
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run Selenium with a chosen driver")
+    parser.add_argument(
+        "--driver",
+        type=str,
+        default="chrome",
+        choices=["chrome", "firefox", "safari"],
+        help="Choose which WebDriver to use",
+    )
+    parser.add_argument(
+        "--notebook",
+        type=str,
+        required=True,
+        help="Notebook to execute",
+    )
+    parser.add_argument(
+        "--kernel",
+        type=str,
+        required=True,
+        help="Kernel to run notebook in",
+    )
+    parser.add_argument(
+        "--stdin",
+        type=str,
+        help="Text to pass to standard input",
+    )
+
+    args = parser.parse_args()
+    URL = f"http://127.0.0.1:8000/lab/index.html?path={args.notebook}"
+
+    # This will start the right driver depending on what
+    # driver option is chosen
+    if args.driver == "chrome":
+        options = ChromeOptions()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        driver = webdriver.Chrome(options=options)
+
+    elif args.driver == "firefox":
+        options = FirefoxOptions()
+        options.add_argument("--headless")
+        driver = webdriver.Firefox(options=options)
+
+    elif args.driver == "safari":
+        driver = webdriver.Safari()
+
+    wait = WebDriverWait(driver, 30)
+
+    # Open Jupyter Lite with the notebook requested
+    driver.get(URL)
+
+    # Waiting for Jupyter Lite URL to finish loading
+    notebook_area = wait.until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".jp-Notebook"))
+    )
+
+    # Without this sleep, the ci will fail for Safari will fail
+    # Unable to currently determine root cause. This is not needed
+    # locally.
+    time.sleep(1)
+
+    # This clears the output of the reference notebook
+    # before executing it, so that when we download it,
+    # we know the output is purely from the ci running
+    # the notebook.
+    clear_notebook_output(driver, notebook_area)
+
+    # Select Kernel based on input
+    choose_kernel(driver, args)
+
+    # This will run all the cells of the chosen notebook
+    run_notebook(driver, notebook_area, args)
+
+    # This section saves the notebook,
+    save_notebook(notebook_area)
+
+    # This section downloads the notebook, so it can be compared
+    # to a reference notebook
+    download_notebook(driver)
 
     # Close browser
     driver.quit()

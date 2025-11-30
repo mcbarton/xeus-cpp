@@ -1,6 +1,7 @@
 import pyautogui
 import time
 
+
 def main():
     # Click Safari icon
     pyautogui.moveTo(150, 720, duration=1)
@@ -28,6 +29,7 @@ def main():
     pyautogui.moveTo(950, 670, duration=1)
     pyautogui.click()
     time.sleep(1.2)
+
 
 if __name__ == "__main__":
     main()
