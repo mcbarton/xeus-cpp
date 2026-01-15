@@ -18,6 +18,8 @@
 #include "xinput.hpp"
 #include "xinspect.hpp"
 #include "xmagics/os.hpp"
+#include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #ifndef EMSCRIPTEN
 #include "xmagics/xassist.hpp"
@@ -48,7 +50,41 @@ void* createInterpreter(const Args &ExtraArgs = {}) {
   ClangArgs.insert(ClangArgs.end(), ExtraArgs.begin(), ExtraArgs.end());
   // FIXME: We should process the kernel input options and conditionally pass
   // the gpu args here.
-  return Cpp::CreateInterpreter(ClangArgs/*, {"-cuda"}*/);
+  Cpp::TInterp_t res = Cpp::CreateInterpreter(ClangArgs /*, {"-cuda"}*/);
+  if (!res)
+  {
+      return res;
+  }
+
+  // clang-repl does not load libomp.so when -fopenmp flag is used
+  // we need to explicitly load it
+  if (std::find_if(
+          ClangArgs.begin(),
+          ClangArgs.end(),
+          [](const std::string& s)
+          {
+              return s.find("-fopenmp") == 0;
+          }
+      )
+      != ClangArgs.end())
+  {
+      if (Cpp::LoadLibrary("libomp"))
+      {
+          return res;
+      }
+      std::string conda_prefix = std::getenv("CONDA_PREFIX");
+#if __APPLE__
+#define LIBRARY_PREFIX ".dylib"
+#else
+#define LIBRARY_PREFIX ".so"
+#endif
+      std::string omp_lib_path = conda_prefix + "/lib/libomp" LIBRARY_PREFIX;
+      if (!Cpp::LoadLibrary(omp_lib_path.c_str()))
+      {
+          std::cerr << "Failed to load libomp (tried location: " << omp_lib_path << ")\n";
+      }
+  }
+  return res;
 }
 
 using namespace std::placeholders;
