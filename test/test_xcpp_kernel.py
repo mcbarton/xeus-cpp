@@ -30,7 +30,6 @@ class BaseXCppCompleteTests(jupyter_kernel_test.KernelTests):
             reply, output_msgs = self.execute_helper(code=self.code_complete_presample_code)
             self.assertEqual(reply["content"]["status"], "ok")
         self.flush_channels()
-        msg_id = self.kc.complete(self.code_complete_sample, len(self.code_complete_sample))
         reply = self.get_non_kernel_info_reply(timeout=1)
         assert reply is not None
         self.assertEqual(reply["msg_type"], "complete_reply")
@@ -47,7 +46,6 @@ class BaseXCppCompleteTests(jupyter_kernel_test.KernelTests):
 
         # Incomplete
         self.flush_channels()
-        msg_id = self.kc.is_complete(self.code_continuation_incomplete)
         reply = self.get_non_kernel_info_reply(timeout=1)
         assert reply is not None
         self.assertEqual(reply["msg_type"], "is_complete_reply")
@@ -56,7 +54,6 @@ class BaseXCppCompleteTests(jupyter_kernel_test.KernelTests):
 
         # Complete
         self.flush_channels()
-        msg_id = self.kc.is_complete(self.code_continuation_complete)
         reply = self.get_non_kernel_info_reply(timeout=1)
         assert reply is not None
         self.assertEqual(reply["msg_type"], "is_complete_reply")
