@@ -5,8 +5,8 @@ channels:
 dependencies:
   - nlohmann_json
   - nlohmann_json-abi
-  - xeus-lite<5.0
-  - xeus
+  - xeus-lite
+  - xeus<6.0.0
   - CppInterOp>=1.8
   - cpp-argparse
   - pugixml
