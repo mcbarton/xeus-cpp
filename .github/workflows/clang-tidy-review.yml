@@ -17,10 +17,10 @@ jobs:
     
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
             
@@ -30,7 +30,7 @@ jobs:
           version: "20"
 
       - name: Run clang-tidy
-        uses: ZedThree/clang-tidy-review@v0.21.0
+        uses: ZedThree/clang-tidy-review@v0.23.1
         id: review
         with:
           build_dir: build
@@ -53,4 +53,4 @@ jobs:
             cmake . -B build -DCMAKE_C_COMPILER="$GITHUB_WORKSPACE/llvm/bin/clang" -DCMAKE_CXX_COMPILER="$GITHUB_WORKSPACE/llvm/bin/clang++" -DCMAKE_EXPORT_COMPILE_COMMANDS=On
             
       - name: Upload artifacts
-        uses: ZedThree/clang-tidy-review/upload@v0.21.0
+        uses: ZedThree/clang-tidy-review/upload@v0.23.1
