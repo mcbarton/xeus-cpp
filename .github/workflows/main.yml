@@ -108,7 +108,7 @@ jobs:
             micromamba_shell_init: cmd.exe
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Backup in case setup-micromamba fails to cleanup when ci job fails on self hosted runner
         if: ${{ runner.environment == 'self-hosted' }}
@@ -117,7 +117,7 @@ jobs:
           rm -rf /root/micromamba-bin/micromamba || true
 
       - name: install mamba
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: environment-dev.yml
           init-shell: >-
@@ -236,7 +236,7 @@ jobs:
 
       - name: Upload to codecov.io
         if: ${{ success() && (matrix.coverage == true) }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage.info
           fail_ci_if_error: true
@@ -263,10 +263,10 @@ jobs:
             os: macos-15
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: install mamba
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: environment-wasm-build.yml
           init-shell: bash
