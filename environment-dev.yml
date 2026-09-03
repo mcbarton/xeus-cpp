@@ -5,7 +5,7 @@ dependencies:
   # Build dependencies
   - make
   - cmake
-  - sel(unix): clangxx=21
+  - sel(unix): clangxx=21.1.8=*5
   - sel(win): cxx-compiler
   - sel(linux): cxx-compiler
   # Host dependencies
