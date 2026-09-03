@@ -20,6 +20,7 @@ dependencies:
   - curl
   - libcurl
   - libcurl-static
+  - python=3.14.6
   # Test dependencies
   - pytest
   - jupyter_kernel_test<0.8
