@@ -104,6 +104,22 @@ find_package(CppInterOp ${CppInterOp_REQUIRED_VERSION} REQUIRED)
 if(CppInterOp_FOUND)
   message(STATUS "Found CppInterOp: config=${CPPINTEROP_CMAKE_DIR} dir=${CPPINTEROP_INSTALL_PREFIX} (found version=${CPPINTEROP_VERSION} compatible with Clang ${CPPINTEROP_LLVM_VERSION_MAJOR}.x)")
 endif()
+if(EMSCRIPTEN)
+    set(XEUS_CPP_CPPINTEROP_SHARED FALSE)
+    set(XEUS_CPP_CPPINTEROP_SHARED_JSON "")
+
+    get_target_property(
+        CPPINTEROP_LIBRARY_TYPE
+        clangCppInterOp
+        TYPE
+    )
+
+    if(CPPINTEROP_LIBRARY_TYPE STREQUAL "SHARED_LIBRARY")
+        set(XEUS_CPP_CPPINTEROP_SHARED TRUE)
+        set(XEUS_CPP_CPPINTEROP_SHARED_JSON
+            ",\n      \"libclangCppInterOp.so\": \"lib/libclangCppInterOp.so\"")
+    endif()
+endif()
 
 find_package(argparse REQUIRED)
 find_package(pugixml REQUIRED)

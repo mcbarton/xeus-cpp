@@ -78,14 +78,14 @@ if(EMSCRIPTEN)
     )
 
     target_include_directories(test_xeus_cpp PRIVATE ${XEUS_CPP_INCLUDE_DIR})
-
-    add_custom_command(TARGET test_xeus_cpp POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_INSTALL_PREFIX}/lib/libclangCppInterOp.so
-        ${CMAKE_CURRENT_BINARY_DIR}/libclangCppInterOp.so
-        COMMENT "Copying libclangCppInterOp.so to the test directory"
-    )
-
+    if(XEUS_CPP_CPPINTEROP_SHARED)
+        add_custom_command(TARGET test_xeus_cpp POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_INSTALL_PREFIX}/lib/libclangCppInterOp.so
+            ${CMAKE_CURRENT_BINARY_DIR}/libclangCppInterOp.so
+            COMMENT "Copying libclangCppInterOp.so to the test directory"
+        )
+    endif()
     add_custom_command(TARGET test_xeus_cpp POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_INSTALL_PREFIX}/lib/libxeus.so
