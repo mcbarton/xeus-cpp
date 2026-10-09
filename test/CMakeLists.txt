@@ -81,7 +81,7 @@ if(EMSCRIPTEN)
     if(XEUS_CPP_CPPINTEROP_SHARED)
         add_custom_command(TARGET test_xeus_cpp POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_INSTALL_PREFIX}/lib/libclangCppInterOp.so
+            ${CPPINTEROP_LIBRARIES}
             ${CMAKE_CURRENT_BINARY_DIR}/libclangCppInterOp.so
             COMMENT "Copying libclangCppInterOp.so to the test directory"
         )
