@@ -116,8 +116,11 @@ else()
 
     target_link_libraries(test_xeus_cpp xeus-cpp doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
     target_include_directories(test_xeus_cpp PRIVATE ${XEUS_CPP_INCLUDE_DIR})
-    if(NOT WIN32)
-        # FIXME: Get the check-xeus-cpp target to work on Windows
-        add_custom_target(check-xeus-cpp COMMAND test_xeus_cpp DEPENDS test_xeus_cpp)
-    endif()
+    add_test(NAME xeus-cpp-tests COMMAND test_xeus_cpp)
+
+    add_custom_target(
+       check-xeus-cpp
+       COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+       DEPENDS test_xeus_cpp
+   )
 endif()
