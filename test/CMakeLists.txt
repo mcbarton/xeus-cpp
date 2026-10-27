@@ -95,22 +95,6 @@ if(EMSCRIPTEN)
     )
 else()
     find_package(Threads)
-
-    if (APPLE)
-        set_target_properties(test_xeus_cpp PROPERTIES
-            MACOSX_RPATH ON
-        )
-    else()
-        set_target_properties(test_xeus_cpp PROPERTIES
-            BUILD_WITH_INSTALL_RPATH 1
-            SKIP_BUILD_RPATH FALSE
-        )
-    endif()
-
-    set_target_properties(test_xeus_cpp PROPERTIES
-        INSTALL_RPATH_USE_LINK_PATH TRUE
-    )
-
     target_link_libraries(test_xeus_cpp xeus-cpp doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
     target_include_directories(test_xeus_cpp PRIVATE ${XEUS_CPP_INCLUDE_DIR})
     add_test(NAME xeus-cpp-tests COMMAND test_xeus_cpp)
