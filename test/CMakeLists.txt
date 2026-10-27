@@ -114,6 +114,12 @@ else()
     target_link_libraries(test_xeus_cpp xeus-cpp doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
     target_include_directories(test_xeus_cpp PRIVATE ${XEUS_CPP_INCLUDE_DIR})
     add_test(NAME xeus-cpp-tests COMMAND test_xeus_cpp)
+    if(WIN32)
+        set_tests_properties(xeus-cpp-tests PROPERTIES
+            ENVIRONMENT_MODIFICATION
+                "PATH=path_list_prepend:$<TARGET_FILE_DIR:test_xeus_cpp>"
+        )
+    endif()
 
     add_custom_target(
        check-xeus-cpp
