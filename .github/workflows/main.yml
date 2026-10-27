@@ -134,8 +134,7 @@ jobs:
           }
           cd build
           set CL=/MP
-          Error-OnFailure { cmake --build . --target test_xeus_cpp  --parallel $env:ncpus --config Release }
-          Error-OnFailure { & "D:\a\xeus-cpp\xeus-cpp\build\test\test_xeus_cpp.exe" }
+          Error-OnFailure { cmake --build . --target check-xeus-cpp  --parallel $env:ncpus --config Release }
           Error-OnFailure { cmake --build . --target install  --parallel $env:ncpus --config Release }
 
       - name: build, run C++ tests & install
