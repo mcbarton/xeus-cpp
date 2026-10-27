@@ -11,12 +11,9 @@
 # ==========
 
 cmake_minimum_required(VERSION 3.24)
-
+enable_testing()
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xeus-cpp-test)
-
-    enable_testing()
-
     find_package(xeus-cpp REQUIRED CONFIG)
 endif()
 
