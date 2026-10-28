@@ -101,7 +101,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$env:MAMBA_ROOT_PREFIX/envs/xeus-cpp" -DCMAKE_INSTALL_PREFIX="$env:MAMBA_ROOT_PREFIX/envs/xeus-cpp"
+          cmake .. -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$env:MAMBA_ROOT_PREFIX/envs/xeus-cpp" -DCMAKE_INSTALL_PREFIX="$env:MAMBA_ROOT_PREFIX/envs/xeus-cpp"
 
       - name: cmake configure
         if: ${{ runner.os != 'windows' }}
